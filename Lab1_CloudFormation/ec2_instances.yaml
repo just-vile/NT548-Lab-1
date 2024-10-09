@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Launch EC2 instances in public and private subnets
+
+Resources:
+  PublicInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: <YourKeyPair>
+      ImageId: ami-12345678
+      SubnetId: !ImportValue PublicSubnetID
+      SecurityGroupIds:
+        - !ImportValue PublicSGID
+
+  PrivateInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: <YourKeyPair>
+      ImageId: ami-12345678
+      SubnetId: !ImportValue PrivateSubnetID
+      SecurityGroupIds:
+        - !ImportValue PrivateSGID
+
+Outputs:
+  PublicInstanceID:
+    Description: Public EC2 Instance ID
+    Value: !Ref PublicInstance
+  PrivateInstanceID:
+    Description: Private EC2 Instance ID
+    Value: !Ref PrivateInstance

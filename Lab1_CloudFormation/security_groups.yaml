@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create security groups for EC2 instances
+
+Resources:
+  PublicSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Public EC2 security group
+      VpcId: !ImportValue VPCID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: <YourIP>/32
+
+  PrivateSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Private EC2 security group
+      VpcId: !ImportValue VPCID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref PublicSecurityGroup
+
+Outputs:
+  PublicSGID:
+    Description: Public Security Group ID
+    Value: !Ref PublicSecurityGroup
+  PrivateSGID:
+    Description: Private Security Group ID
+    Value: !Ref PrivateSecurityGroup

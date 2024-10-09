@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Main stack to deploy all services
+
+Resources:
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: <S3-URL>/vpc.yaml
+
+  RouteTableStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: <S3-URL>/route_tables.yaml
+      Parameters:
+        VPCID: !GetAtt VPCStack.Outputs.VPCID
+        InternetGatewayID: !GetAtt VPCStack.Outputs.InternetGatewayID
+
+  NatGatewayStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: <S3-URL>/nat_gateway.yaml
+      Parameters:
+        PublicSubnetID: !GetAtt VPCStack.Outputs.PublicSubnetID
+
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: <S3-URL>/security_groups.yaml
+      Parameters:
+        VPCID: !GetAtt VPCStack.Outputs.VPCID
+
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: <S3-URL>/ec2_instances.yaml
+      Parameters:
+        PublicSubnetID: !GetAtt VPCStack.Outputs.PublicSubnetID
+        PrivateSubnetID: !GetAtt VPCStack.Outputs.PrivateSubnetID
+        PublicSGID: !GetAtt SecurityGroupStack.Outputs.PublicSGID
+        PrivateSGID: !GetAtt SecurityGroupStack.Outputs.PrivateSGID
