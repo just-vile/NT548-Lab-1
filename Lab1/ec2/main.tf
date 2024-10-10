@@ -2,7 +2,6 @@ resource "aws_instance" "public" {
   ami           = var.ami
   instance_type = var.instance_type
   subnet_id     = var.public_subnet_id
-  # Replace group_name with vpc_security_group_ids
   vpc_security_group_ids = [aws_security_group.public_sg.id]
   key_name = var.key_name
   tags = {
@@ -14,7 +13,6 @@ resource "aws_instance" "private" {
   ami           = var.ami
   instance_type = var.instance_type
   subnet_id     = var.private_subnet_id
-  # Replace group_name with vpc_security_group_ids
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   key_name = var.key_name
   tags = {
@@ -31,7 +29,6 @@ resource "aws_security_group" "public_sg" {
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["58.187.185.59/32"]
-    # cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

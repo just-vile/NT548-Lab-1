@@ -22,7 +22,6 @@ module "route_table" {
 
 module "ec2" {
   source = "./ec2"
-  # ami = "ami-032346ab877c418af"
   ami = "ami-0866a3c8686eaeeba"
   instance_type = "t2.micro"
   vpc_id = module.vpc.vpc_id
