@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create Internet Gateway and NAT Gateway
+
+Parameters:
+  VPCId:
+    Type: String
+    Description: VPC Id
+  PublicSubnetId:
+    Type: String
+    Description: Public Subnet Id
+
+Resources:
+  MyInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags:
+        - Key: Name
+          Value: MyInternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPCId
+      InternetGatewayId: !Ref MyInternetGateway
+
+  MyEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  MyNATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnetId
+      AllocationId: !GetAtt MyEIP.AllocationId
+      Tags:
+        - Key: Name
+          Value: MyNATGateway
+
+Outputs:
+  InternetGatewayId:
+    Description: The Internet Gateway Id
+    Value: !Ref MyInternetGateway
+
+  NATGatewayId:
+    Description: The NAT Gateway Id
+    Value: !Ref MyNATGateway

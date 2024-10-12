@@ -1,33 +1,47 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Create security groups for EC2 instances
+Description: Create Security Groups for EC2 Instances
+
+Parameters:
+  VPCId:
+    Type: String
+    Description: VPC Id
 
 Resources:
-  PublicSecurityGroup:
+  PublicEC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Public EC2 security group
-      VpcId: !ImportValue VPCID
+      GroupDescription: Allow SSH from specific IP
+      VpcId: !Ref VPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: <YourIP>/32
+          CidrIp: 42.112.228.59/32
+          # CidrIP: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: PublicEC2SecurityGroup
 
-  PrivateSecurityGroup:
+  PrivateEC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Private EC2 security group
-      VpcId: !ImportValue VPCID
+      GroupDescription: Allow SSH from Public EC2
+      VpcId: !Ref VPCId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          SourceSecurityGroupId: !Ref PublicSecurityGroup
+          SourceSecurityGroupId: !Ref PublicEC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: PrivateEC2SecurityGroup
 
 Outputs:
-  PublicSGID:
-    Description: Public Security Group ID
-    Value: !Ref PublicSecurityGroup
-  PrivateSGID:
-    Description: Private Security Group ID
-    Value: !Ref PrivateSecurityGroup
+  PublicSecurityGroupId:
+    Description: The Public EC2 Security Group Id
+    Value: !Ref PublicEC2SecurityGroup
+
+  PrivateSecurityGroupId:
+    Description: The Private EC2 Security Group Id
+    Value: !Ref PrivateEC2SecurityGroup
+  

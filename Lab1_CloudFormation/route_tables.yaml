@@ -1,35 +1,62 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Create route tables for public and private subnets
+Description: Create Route Tables for Public and Private Subnets
+
+Parameters:
+  VPCId:
+    Type: String
+    Description: VPC Id
+  PublicSubnetId:
+    Type: String
+    Description: Public Subnet Id
+  PrivateSubnetId:
+    Type: String
+    Description: Private Subnet Id
+  InternetGatewayId:
+    Type: String
+    Description: Internet Gateway Id
+  NATGatewayId:
+    Type: String
+    Description: NAT Gateway Id
 
 Resources:
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !ImportValue VPCID
-
-  PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !ImportValue VPCID
+      VpcId: !Ref VPCId
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
 
   PublicRoute:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !ImportValue InternetGatewayID
+      GatewayId: !Ref InternetGatewayId
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetId
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCId
+      Tags:
+        - Key: Name
+          Value: PrivateRouteTable
 
   PrivateRoute:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !ImportValue NatGatewayID
+      NatGatewayId: !Ref NATGatewayId
 
-Outputs:
-  PublicRouteTableID:
-    Description: Public Route Table ID
-    Value: !Ref PublicRouteTable
-  PrivateRouteTableID:
-    Description: Private Route Table ID
-    Value: !Ref PrivateRouteTable
+  PrivateSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetId
+      RouteTableId: !Ref PrivateRouteTable

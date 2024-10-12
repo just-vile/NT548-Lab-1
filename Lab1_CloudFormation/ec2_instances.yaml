@@ -1,31 +1,46 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Launch EC2 instances in public and private subnets
+Description: Create EC2 Instances in Public and Private Subnets
+
+Parameters:
+  PublicSubnetId:
+    Type: String
+    Description: Public Subnet Id
+  PrivateSubnetId:
+    Type: String
+    Description: Private Subnet Id
+  PublicSecurityGroupId:
+    Type: String
+    Description: Public EC2 Security Group Id
+  PrivateSecurityGroupId:
+    Type: String
+    Description: Private EC2 Security Group Id
+  KeyName:
+    Type: String
+    Description: Key pair name to SSH into EC2 instances
 
 Resources:
-  PublicInstance:
+  PublicEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      KeyName: <YourKeyPair>
-      ImageId: ami-12345678
-      SubnetId: !ImportValue PublicSubnetID
+      KeyName: !Ref KeyName
       SecurityGroupIds:
-        - !ImportValue PublicSGID
+        - !Ref PublicSecurityGroupId
+      SubnetId: !Ref PublicSubnetId
+      ImageId: ami-0866a3c8686eaeeba
+      Tags:
+        - Key: Name
+          Value: PublicEC2Instance
 
-  PrivateInstance:
+  PrivateEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      KeyName: <YourKeyPair>
-      ImageId: ami-12345678
-      SubnetId: !ImportValue PrivateSubnetID
+      KeyName: !Ref KeyName
       SecurityGroupIds:
-        - !ImportValue PrivateSGID
-
-Outputs:
-  PublicInstanceID:
-    Description: Public EC2 Instance ID
-    Value: !Ref PublicInstance
-  PrivateInstanceID:
-    Description: Private EC2 Instance ID
-    Value: !Ref PrivateInstance
+        - !Ref PrivateSecurityGroupId
+      SubnetId: !Ref PrivateSubnetId
+      ImageId: ami-0866a3c8686eaeeba
+      Tags:
+        - Key: Name
+          Value: PrivateEC2Instance
